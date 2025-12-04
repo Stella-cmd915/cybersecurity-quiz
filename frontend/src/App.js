@@ -7,12 +7,12 @@ import DemographicsForm from './components/DemographicsForm';
 const CyberQuizApp = () => {
   const [stage, setStage] = useState('category');
   const [category, setCategory] = useState(null);
-  const [sessionId, setSessionId] = useState(null);
+  const [_sessionId, setSessionId] = useState(null);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [questions, setQuestions] = useState([]);
   const [userAnswers, setUserAnswers] = useState([]);
   const [results, setResults] = useState(null);
-  const [demographics, setDemographics] = useState({});
+  const [_demographics, setDemographics] = useState({});
   const [showFeedback, setShowFeedback] = useState(false);
   const [lastAnswer, setLastAnswer] = useState(null);
 
