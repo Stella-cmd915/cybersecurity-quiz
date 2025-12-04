@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
-import { Shield, AlertTriangle, Award, TrendingUp, CheckCircle, XCircle, Target, BookOpen, Download } from 'lucide-react';
+import { Shield, AlertTriangle, Award, TrendingUp, CheckCircle, XCircle, Target, BookOpen, } from 'lucide-react';
 import DemographicsForm from './components/DemographicsForm';
 
 const CyberQuizApp = () => {
