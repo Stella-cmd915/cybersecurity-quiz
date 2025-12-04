@@ -2,51 +2,184 @@ import React, { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
 import { Shield, AlertTriangle, Award, TrendingUp, CheckCircle, XCircle, Target, BookOpen } from 'lucide-react';
 import DemographicsForm from './components/DemographicsForm';
-//import AnimatedBackground from './AnimatedBackground';
 
 const CyberQuizApp = () => {
   const [stage, setStage] = useState('category');
   const [category, setCategory] = useState(null);
-  //const [_sessionId, setSessionId] = useState(null);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [questions, setQuestions] = useState([]);
   const [userAnswers, setUserAnswers] = useState([]);
   const [results, setResults] = useState(null);
-  //const [_demographics, setDemographics] = useState({});
   const [showFeedback, setShowFeedback] = useState(false);
   const [lastAnswer, setLastAnswer] = useState(null);
 
+  // ============================================
+  // ΠΑΙΔΙΑ (8-12 ΕΤΩΝ) - 45 ΕΡΩΤΗΣΕΙΣ
+  // ============================================
+  const childQuestions = [
+    // Θεματική 1: Κωδικοί Πρόσβασης (7)
+    { id: 1, theme: 'passwords', question_text: 'Ποιος είναι ένας καλός κωδικός;', options: { a: '123456', b: 'toonomamou', c: '$uperK0d1k0$' }, correct_answer: 'c', explanation: 'Ένας ισχυρός κωδικός έχει αριθμούς, σύμβολα και κεφαλαία!' },
+    { id: 2, theme: 'passwords', question_text: 'Πρέπει να λες τον κωδικό σου στους φίλους σου;', options: { a: 'Ναι, αν είναι καλοί φίλοι', b: 'Όχι, μόνο στους γονείς ή τον δάσκαλο', c: 'Σε όποιον μού τον ζητήσει' }, correct_answer: 'b', explanation: 'Οι κωδικοί είναι προσωπικοί!' },
+    { id: 3, theme: 'passwords', question_text: 'Είναι καλό να χρησιμοποιείς το όνομά σου για κωδικό;', options: { a: 'Ναι, είναι εύκολο να το θυμάμαι', b: 'Όχι, είναι εύκολο να το μαντέψουν', c: 'Μόνο αν προσθέσω αριθμούς' }, correct_answer: 'b', explanation: 'Το όνομά σου είναι εύκολο να το βρουν άλλοι!' },
+    { id: 4, theme: 'passwords', question_text: 'Τι σημαίνει «ισχυρός κωδικός»;', options: { a: 'Έχει μόνο γράμματα', b: 'Έχει αριθμούς, σύμβολα και κεφαλαία', c: 'Είναι μικρός και εύκολος' }, correct_answer: 'b', explanation: 'Ένας ισχυρός κωδικός συνδυάζει διαφορετικά στοιχεία!' },
+    { id: 5, theme: 'passwords', question_text: 'Πόσο συχνά πρέπει να αλλάζουμε τους κωδικούς μας;', options: { a: 'Ποτέ', b: 'Κάθε μέρα', c: 'Ανά μερικούς μήνες' }, correct_answer: 'c', explanation: 'Είναι καλό να αλλάζουμε τους κωδικούς κάθε λίγους μήνες!' },
+    { id: 6, theme: 'passwords', question_text: 'Αν κάποιος μάθει τον κωδικό σου, τι πρέπει να κάνεις;', options: { a: 'Να τον αλλάξεις αμέσως', b: 'Να τον αφήσεις ίδιο', c: 'Να ρωτήσεις τον φίλο αν θα τον πει αλλού' }, correct_answer: 'a', explanation: 'Άμεση αλλαγή κωδικού!' },
+    { id: 7, theme: 'passwords', question_text: 'Είναι καλό να χρησιμοποιείς τον ίδιο κωδικό παντού;', options: { a: 'Ναι, για να μην τον ξεχνάω', b: 'Όχι, γιατί είναι επικίνδυνο', c: 'Μόνο σε παιχνίδια' }, correct_answer: 'b', explanation: 'Διαφορετικοί κωδικοί είναι πιο ασφαλείς!' },
+    
+    // Θεματική 2: Phishing (6)
+    { id: 8, theme: 'phishing', question_text: 'Τι είναι phishing;', options: { a: 'Μήνυμα για ψάρεμα', b: 'Μήνυμα που προσπαθεί να σε ξεγελάσει', c: 'Μήνυμα από φίλο' }, correct_answer: 'b', explanation: 'Το phishing είναι απάτη!' },
+    { id: 9, theme: 'phishing', question_text: 'Αν λάβεις email που λέει «Κέρδισες δώρο», τι κάνεις;', options: { a: 'Κάνω κλικ αμέσως', b: 'Το δείχνω σε γονιό ή δάσκαλο', c: 'Το αγνοώ και το διαγράφω' }, correct_answer: 'b', explanation: 'Δείχνε τέτοια μηνύματα σε ενήλικα!' },
+    { id: 10, theme: 'phishing', question_text: 'Μπορεί ένα phishing μήνυμα να μοιάζει αληθινό;', options: { a: 'Ναι', b: 'Όχι', c: 'Δεν ξέρω' }, correct_answer: 'a', explanation: 'Τα phishing μηνύματα προσπαθούν να μοιάσουν αληθινά!' },
+    { id: 11, theme: 'phishing', question_text: 'Αν ένα μήνυμα ζητά τους κωδικούς σου;', options: { a: 'Τους δίνω', b: 'Δεν τους δίνω ποτέ', c: 'Μόνο αν γράφει ότι είναι από το σχολείο' }, correct_answer: 'b', explanation: 'Ποτέ μην δίνεις κωδικούς!' },
+    { id: 12, theme: 'phishing', question_text: 'Ποιο είναι σημάδι phishing;', options: { a: 'Ορθογραφικά λάθη και περίεργο email αποστολέα', b: 'Μήνυμα από συμμαθητή', c: 'Μήνυμα από τη δασκάλα' }, correct_answer: 'a', explanation: 'Λάθη είναι σημάδια phishing!' },
+    { id: 13, theme: 'phishing', question_text: 'Αν σου στείλουν μήνυμα με link, τι κάνεις;', options: { a: 'Το ανοίγω κατευθείαν', b: 'Το δείχνω σε ενήλικα', c: 'Το στέλνω σε φίλους' }, correct_answer: 'b', explanation: 'Ζήτα βοήθεια πριν κάνεις κλικ!' },
+    
+    // Θεματική 3: Social Media (7)
+    { id: 14, theme: 'social_media', question_text: 'Πρέπει να δέχεσαι αιτήματα φιλίας από αγνώστους;', options: { a: 'Ναι', b: 'Όχι', c: 'Μόνο αν έχουν ωραία φωτογραφία' }, correct_answer: 'b', explanation: 'Δέξου μόνο γνωστούς!' },
+    { id: 15, theme: 'social_media', question_text: 'Ποιος μπορεί να δει τις φωτογραφίες σου αν το προφίλ είναι δημόσιο;', options: { a: 'Μόνο εγώ', b: 'Όλοι', c: 'Μόνο οι φίλοι μου' }, correct_answer: 'b', explanation: 'Το δημόσιο προφίλ είναι ορατό σε όλους!' },
+    { id: 16, theme: 'social_media', question_text: 'Είναι καλό να γράφεις το τηλέφωνό σου στα σχόλια;', options: { a: 'Ναι, αν το ζητάνε', b: 'Όχι, ποτέ', c: 'Μόνο στους φίλους μου' }, correct_answer: 'b', explanation: 'Το τηλέφωνό σου είναι προσωπικό!' },
+    { id: 17, theme: 'social_media', question_text: 'Πρέπει να ανεβάζεις φωτογραφίες αγνώστων;', options: { a: 'Ναι, αν είναι ωραίες', b: 'Όχι', c: 'Μόνο αν τους ρωτήσω' }, correct_answer: 'c', explanation: 'Ζήτα άδεια πρώτα!' },
+    { id: 18, theme: 'social_media', question_text: 'Αν κάποιος σου ζητήσει τη διεύθυνσή σου;', options: { a: 'Την δίνω', b: 'Δεν την δίνω ποτέ', c: 'Την λέω μόνο αν είναι φίλος' }, correct_answer: 'b', explanation: 'Ποτέ μην δίνεις τη διεύθυνσή σου online!' },
+    { id: 19, theme: 'social_media', question_text: 'Αν ένας φίλος online σου ζητήσει να συναντηθείτε μόνοι σας;', options: { a: 'Πηγαίνω', b: 'Δεν πάω ποτέ χωρίς να το πω στους γονείς μου', c: 'Πηγαίνω αν είναι κοντά' }, correct_answer: 'b', explanation: 'Πάντα πες το στους γονείς!' },
+    { id: 20, theme: 'social_media', question_text: 'Τι πρέπει να προσέχεις όταν ανεβάζεις φωτογραφία;', options: { a: 'Αν φαίνεται το σπίτι σου ή η τοποθεσία σου', b: 'Αν είναι καθαρή', c: 'Αν είναι ωραία' }, correct_answer: 'a', explanation: 'Προσέχ να μην αποκαλύπτεις τη θέση σου!' },
+    
+    // Θεματική 4: Προστασία Προσωπικών Δεδομένων (5)
+    { id: 21, theme: 'privacy', question_text: 'Ποια είναι προσωπικά δεδομένα;', options: { a: 'Το όνομά σου', b: 'Το αγαπημένο σου χρώμα', c: 'Το ύψος σου' }, correct_answer: 'a', explanation: 'Το όνομα είναι προσωπικό δεδομένο!' },
+    { id: 22, theme: 'privacy', question_text: 'Γιατί πρέπει να προστατεύεις τα προσωπικά σου δεδομένα;', options: { a: 'Γιατί είναι βαρετό να τα ξέρουν όλοι', b: 'Για να μην τα χρησιμοποιήσουν χωρίς άδεια', c: 'Δεν πειράζει αν τα ξέρουν' }, correct_answer: 'b', explanation: 'Πρέπει να προστατευθούν τα δεδομένα σου!' },
+    { id: 23, theme: 'privacy', question_text: 'Είναι ασφαλές να γράφεις τον αριθμό της κάρτας σου online;', options: { a: 'Ναι, αν το site είναι ωραίο', b: 'Όχι, ποτέ χωρίς γονείς', c: 'Ναι, αν μου το ζητήσουν' }, correct_answer: 'b', explanation: 'Ποτέ μην δίνεις αριθμούς κάρτας χωρίς γονείς!' },
+    { id: 24, theme: 'privacy', question_text: 'Πρέπει να γράφεις το σχολείο σου online;', options: { a: 'Ναι, είναι ωραίο να ξέρουν', b: 'Όχι, εκτός αν είναι απαραίτητο', c: 'Μόνο στους φίλους μου' }, correct_answer: 'b', explanation: 'Περιόρισε τις πληροφορίες που δίνεις!' },
+    { id: 25, theme: 'privacy', question_text: 'Αν δώσεις πολλά προσωπικά σου στοιχεία online, τι μπορεί να γίνει;', options: { a: 'Να τα χρησιμοποιήσουν για κακό', b: 'Τίποτα', c: 'Να σου στείλουν δώρα' }, correct_answer: 'a', explanation: 'Τα προσωπικά δεδομένα μπορεί να χρησιμοποιηθούν κακόβουλα!' },
+    
+    // Θεματική 5: Ασφαλής περιήγηση (6)
+    { id: 26, theme: 'safe_browsing', question_text: 'Τι σημαίνει το λουκετάκι στη γραμμή διεύθυνσης;', options: { a: 'Ότι είναι κλειδωμένη η οθόνη', b: 'Ότι η ιστοσελίδα είναι ασφαλής', c: 'Ότι χρειάζεται κωδικός' }, correct_answer: 'b', explanation: 'Το κλειδί σημαίνει ασφαλή σύνδεση!' },
+    { id: 27, theme: 'safe_browsing', question_text: 'Είναι ασφαλές να κατεβάζεις apps από άγνωστα sites;', options: { a: 'Ναι, αν είναι δωρεάν', b: 'Όχι, μπορεί να έχουν ιούς', c: 'Μόνο αν τα θέλω πολύ' }, correct_answer: 'b', explanation: 'Κατεβάζ μόνο από επίσημα κατάστηματα!' },
+    { id: 28, theme: 'safe_browsing', question_text: 'Τι είναι το antivirus;', options: { a: 'Παιχνίδι', b: 'Πρόγραμμα προστασίας από ιούς', c: 'Κωδικός' }, correct_answer: 'b', explanation: 'Το antivirus προστατεύει από κακόβουλο λογισμικό!' },
+    { id: 29, theme: 'safe_browsing', question_text: 'Γιατί πρέπει να ενημερώνεις τις εφαρμογές σου;', options: { a: 'Για να μην βαριούνται', b: 'Για να λειτουργούν σωστά και με ασφάλεια', c: 'Για να αλλάζει το χρώμα τους' }, correct_answer: 'b', explanation: 'Οι ενημερώσεις διορθώνουν ασφαλειακές τρύπες!' },
+    { id: 30, theme: 'safe_browsing', question_text: 'Τι πρέπει να κοιτάς πριν κατεβάσεις μια εφαρμογή;', options: { a: 'Αν την έχει ο φίλος σου', b: 'Αν έχει καλές κριτικές και είναι από επίσημο κατάστημα', c: 'Αν είναι δωρεάν' }, correct_answer: 'b', explanation: 'Κοίτα κριτικές και πηγή πριν κατεβάσεις!' },
+    { id: 31, theme: 'safe_browsing', question_text: 'Είναι καλό να πατάς διαφημίσεις που υπόσχονται δώρα;', options: { a: 'Ναι, μπορεί να κερδίσεις', b: 'Όχι, μπορεί να είναι παγίδα', c: 'Μόνο αν φαίνονται αληθινές' }, correct_answer: 'b', explanation: 'Αποφύγ ύποπτες διαφημίσεις!' },
+    
+    // Θεματική 6: Online Συμπεριφορά (3)
+    { id: 32, theme: 'online_behavior', question_text: 'Πρέπει να φερόμαστε ευγενικά online;', options: { a: 'Ναι, όπως και στη ζωή', b: 'Όχι, γιατί δεν με βλέπουν', c: 'Μόνο αν είναι φίλοι' }, correct_answer: 'a', explanation: 'Να φερόμαστε ευγενικά παντού!' },
+    { id: 33, theme: 'online_behavior', question_text: 'Αν δεις κάποιον να κοροϊδεύει άλλους online, τι κάνεις;', options: { a: 'Το λες σε ενήλικα', b: 'Γελάς μαζί του', c: 'Δεν κάνεις τίποτα' }, correct_answer: 'a', explanation: 'Αναφέρ το bullying πάντα!' },
+    { id: 34, theme: 'online_behavior', question_text: 'Τι μπορεί να κάνει η Τεχνητή Νοημοσύνη (AI);', options: { a: 'Να σε προστατέψει online', b: 'Να σου γράφει τις εργασίες', c: 'Και τα δύο' }, correct_answer: 'c', explanation: 'Η AI έχει πολλές δυνατότητες αλλά και κινδύνους!' },
+    
+    // Θεματική 7: Influencers & Media Literacy (11)
+    { id: 35, theme: 'influencers', question_text: 'Αν ο αγαπημένος σου YouTuber σου πει να αγοράσεις κάτι, τι κάνεις;', options: { a: 'Το αγοράζω γιατί μου αρέσει', b: 'Το λέω στους γονείς μου', c: 'Το σκέφτομαι πρώτα αν το χρειάζομαι' }, correct_answer: 'c', explanation: 'Σκέψου προσεκτικά πριν αγοράσεις!' },
+    { id: 36, theme: 'influencers', question_text: 'Πιστεύεις ότι οι influencers λένε πάντα την αλήθεια;', options: { a: 'Ναι, γιατί τους εμπιστεύομαι', b: 'Όχι πάντα – μπορεί να πληρώνονται', c: 'Δεν ξέρω' }, correct_answer: 'b', explanation: 'Οι influencers μπορεί να διαφημίζουν πράγματα για χρήματα!' },
+    { id: 37, theme: 'influencers', question_text: 'Αν κάποιος online σε πείσει να κάνεις κάτι που δεν θέλεις;', options: { a: 'Το κάνω για να μην τον στενοχωρήσω', b: 'Το λέω σε έναν ενήλικα', c: 'Το κρατάω μυστικό' }, correct_answer: 'b', explanation: 'Μην αφήνεις άλλους να σε πιέζουν!' },
+    { id: 38, theme: 'influencers', question_text: 'Όταν βλέπεις διαφημίσεις μέσα στα βίντεο ή στα παιχνίδια, τι κάνεις;', options: { a: 'Τις παρακολουθώ', b: 'Τις αγνοώ', c: 'Ρωτάω τους γονείς μου' }, correct_answer: 'b', explanation: 'Αγνόησ τις ύποπτες διαφημίσεις!' },
+    { id: 39, theme: 'influencers', question_text: 'Σου έχει τύχει να επηρεαστείς από YouTuber/TikToker για να παίξεις ένα παιχνίδι;', options: { a: 'Ναι', b: 'Όχι', c: 'Δεν θυμάμαι' }, correct_answer: 'b', explanation: 'Προσέχ τις επιρροές!' },
+    { id: 40, theme: 'influencers', question_text: 'Πόσο χρόνο περνάς βλέποντας βίντεο στο YouTube/TikTok κάθε μέρα;', options: { a: 'Λιγότερο από 1 ώρα', b: '1–2 ώρες', c: 'Πάνω από 2 ώρες' }, correct_answer: 'a', explanation: 'Περιόρισ τον χρόνο που περνάς online!' },
+    { id: 41, theme: 'influencers', question_text: 'Πιστεύεις ότι οι φίλοι σου επηρεάζονται από influencers;', options: { a: 'Ναι, πολύ', b: 'Λίγο', c: 'Καθόλου' }, correct_answer: 'a', explanation: 'Οι influencers έχουν ισχυρή επιρροή!' },
+    { id: 42, theme: 'influencers', question_text: 'Ξέρεις πότε μια διαφήμιση είναι κρυφή (μέσα σε βίντεο ή story);', options: { a: 'Ναι, καταλαβαίνω', b: 'Όχι', c: 'Μερικές φορές' }, correct_answer: 'a', explanation: 'Προσέχ τις κρυφές διαφημίσεις!' },
+    { id: 43, theme: 'influencers', question_text: 'Έχεις προσπαθήσει να κάνεις κάτι επειδή το είδες σε βίντεο;', options: { a: 'Ναι', b: 'Όχι', c: 'Ίσως' }, correct_answer: 'b', explanation: 'Μην κάνεις επικίνδυνα πράγματα γιατί τα είδες online!' },
+    { id: 44, theme: 'influencers', question_text: 'Ποιος σε βοηθά να καταλάβεις τι είναι αλήθεια ή όχι στο διαδίκτυο;', options: { a: 'Οι γονείς μου', b: 'Οι φίλοι μου', c: 'Κανένας' }, correct_answer: 'a', explanation: 'Οι γονείς μπορούν να σε βοηθήσουν!' },
+    { id: 45, theme: 'media_literacy', question_text: 'Μπορεί η AI να κάνει και λάθη;', options: { a: 'Ναι', b: 'Όχι', c: 'Δεν ξέρω' }, correct_answer: 'a', explanation: 'Ακόμη και η AI μπορεί να κάνει λάθη!' },
+  ];
+
+  // ============================================
+  // ΕΝΗΛΙΚΕΣ (ΓΕΝΙΚΟΙ ΧΡΗΣΤΕΣ) - 30 ΕΡΩΤΗΣΕΙΣ
+  // ============================================
+  const adultQuestions = [
+    // Θεματική 1: Κωδικοί & Authentication (5)
+    { id: 46, theme: 'passwords_auth', question_text: 'Πόσο συχνά αλλάζετε τους κωδικούς σας;', options: { a: 'Ποτέ', b: 'Μία φορά το χρόνο', c: 'Κάθε 3-6 μήνες' }, correct_answer: 'c', explanation: 'Αλλάζ τους κωδικούς κάθε 3-6 μήνες!' },
+    { id: 47, theme: 'passwords_auth', question_text: 'Χρησιμοποιείτε τον ίδιο κωδικό για πολλούς λογαριασμούς;', options: { a: 'Ναι', b: 'Όχι', c: 'Μόνο σε ορισμένους' }, correct_answer: 'b', explanation: 'Χρησιμοποίησ διαφορετικούς κωδικούς!' },
+    { id: 48, theme: 'passwords_auth', question_text: 'Τι είναι Two Factor Authentication (2FA);', options: { a: 'Έλεγχος δύο email', b: 'Έλεγχος με κωδικό + άλλο στοιχείο', c: 'Δεν ξέρω' }, correct_answer: 'b', explanation: 'Το 2FA προσθέτει επιπλέον ασφάλεια!' },
+    { id: 49, theme: 'passwords_auth', question_text: 'Τι πρέπει να περιέχει ένας ισχυρός κωδικός;', options: { a: 'Μόνο αριθμούς', b: 'Μικρά και κεφαλαία γράμματα, σύμβολα, αριθμούς', c: 'Μόνο το όνομά σας' }, correct_answer: 'b', explanation: 'Ένας ισχυρός κωδικός έχει διαφορετικά στοιχεία!' },
+    { id: 50, theme: 'passwords_auth', question_text: 'Ποια εφαρμογή βοηθά στη διαχείριση κωδικών;', options: { a: 'Password manager', b: 'Antivirus', c: 'Browser' }, correct_answer: 'a', explanation: 'Ο password manager αποθηκεύει κωδικούς ασφαλώς!' },
+    
+    // Θεματική 2: Phishing & Scams (5)
+    { id: 51, theme: 'phishing', question_text: 'Τι είναι phishing;', options: { a: 'Μήνυμα για ψάρεμα', b: 'Μήνυμα που προσπαθεί να κλέψει στοιχεία σας', c: 'Ενημερωτικό email' }, correct_answer: 'b', explanation: 'Το phishing είναι απάτη κλοπής δεδομένων!' },
+    { id: 52, theme: 'phishing', question_text: 'Ποιο είναι σημάδι phishing email;', options: { a: 'Ορθογραφικά λάθη και ύποπτος αποστολέας', b: 'Μήνυμα από τράπεζά σας', c: 'Μήνυμα από φίλο' }, correct_answer: 'a', explanation: 'Λάθη και ύποπτες διευθύνσεις είναι σημάδια!' },
+    { id: 53, theme: 'phishing', question_text: 'Αν λάβετε email που ζητά προσωπικά στοιχεία, τι κάνετε;', options: { a: 'Τα στέλνετε αμέσως', b: 'Τα αγνοείτε ή το ελέγχετε από άλλη πηγή', c: 'Τα γράφετε σε απάντηση' }, correct_answer: 'b', explanation: 'Ποτέ μην απαντάς σε αιτήματα δεδομένων!' },
+    { id: 54, theme: 'phishing', question_text: 'Αν λάβετε τηλεφώνημα από άγνωστο που ζητά στοιχεία λογαριασμού;', options: { a: 'Τα δίνετε', b: 'Τα αρνείστε και ενημερώνετε την τράπεζα', c: 'Κλείνετε το τηλέφωνο' }, correct_answer: 'b', explanation: 'Ενημέρωσ πάντα την τράπεζα!' },
+    { id: 55, theme: 'phishing', question_text: 'Ποια μέθοδος μειώνει τον κίνδυνο social engineering;', options: { a: 'Awareness training', b: 'Νέο antivirus', c: 'Πιο γρήγορο internet' }, correct_answer: 'a', explanation: 'Η εκπαίδευση είναι το καλύτερο εργαλείο!' },
+    
+    // Θεματική 3: Social Media Privacy (4)
+    { id: 56, theme: 'privacy', question_text: 'Ποιος μπορεί να δει τα posts σας αν το προφίλ είναι δημόσιο;', options: { a: 'Μόνο οι φίλοι σας', b: 'Όλοι', c: 'Κανείς' }, correct_answer: 'b', explanation: 'Το δημόσιο προφίλ είναι ορατό σε όλους!' },
+    { id: 57, theme: 'privacy', question_text: 'Είναι ασφαλές να δημοσιεύετε τη διεύθυνσή σας online;', options: { a: 'Ναι', b: 'Όχι', c: 'Μόνο στους φίλους' }, correct_answer: 'b', explanation: 'Δεν πρέπει να δημοσιεύεις προσωπικές πληροφορίες!' },
+    { id: 58, theme: 'privacy', question_text: 'Ποια ρύθμιση ενισχύει την ιδιωτικότητα;', options: { a: 'Location tagging', b: 'Friends only posts', c: 'Public posts' }, correct_answer: 'b', explanation: 'Όρισε τις αναρτήσεις σου μόνο για φίλους!' },
+    { id: 59, theme: 'privacy', question_text: 'Τι πρέπει να αποφεύγετε να δημοσιεύετε στα social media;', options: { a: 'Φωτογραφίες φαγητού', b: 'Προσωπικά δεδομένα όπως ΑΦΜ, αριθμούς καρτών', c: 'Τοποθεσία ταξιδιών' }, correct_answer: 'b', explanation: 'Ποτέ μη δημοσιεύεις ευαίσθητα δεδομένα!' },
+    
+    // Θεματική 4: Online Banking & E-commerce (4)
+    { id: 60, theme: 'online_shopping', question_text: 'Τι σημαίνει το λουκετάκι σε μια ιστοσελίδα;', options: { a: 'Ότι είναι ασφαλής (HTTPS)', b: 'Ότι χρειάζεται κωδικό', c: 'Ότι είναι κλειδωμένη' }, correct_answer: 'a', explanation: 'Το κλειδί σημαίνει ασφαλή σύνδεση!' },
+    { id: 61, theme: 'online_shopping', question_text: 'Είναι ασφαλές να χρησιμοποιείτε δημόσιο Wi-Fi για online banking;', options: { a: 'Ναι', b: 'Όχι', c: 'Μόνο με VPN' }, correct_answer: 'b', explanation: 'Το δημόσιο Wi-Fi είναι επικίνδυνο!' },
+    { id: 62, theme: 'online_shopping', question_text: 'Ποια μέθοδος πληρωμής είναι πιο ασφαλής;', options: { a: 'Κατάθεση σε IBAN που στέλνει email', b: 'Μέσω έμπιστης πλατφόρμας (π.χ. PayPal)', c: 'Άμεση κάρτα' }, correct_answer: 'b', explanation: 'Χρησιμοποίησ έμπιστες πλατφόρμες!' },
+    { id: 63, theme: 'online_shopping', question_text: 'Τι πρέπει να προσέχετε όταν κατεβάζετε εφαρμογές;', options: { a: 'Αν έχουν καλές κριτικές', b: 'Αν είναι από επίσημο κατάστημα', c: 'Αν είναι δωρεάν' }, correct_answer: 'b', explanation: 'Κατεβάζ μόνο από επίσημα κατάστηματα!' },
+    
+    // Θεματική 5: Device & Network Security (3)
+    { id: 64, theme: 'device_security', question_text: 'Τι είναι VPN;', options: { a: 'Εικονικό ιδιωτικό δίκτυο', b: 'Πρόγραμμα γραφικών', c: 'Social media' }, correct_answer: 'a', explanation: 'Το VPN κρυπτογραφεί τη σύνδεσή σου!' },
+    { id: 65, theme: 'device_security', question_text: 'Γιατί πρέπει να ενημερώνετε τακτικά τις εφαρμογές σας;', options: { a: 'Για αισθητική', b: 'Για λόγους ασφαλείας', c: 'Για να αλλάζει το logo' }, correct_answer: 'b', explanation: 'Οι ενημερώσεις διορθώνουν ασφαλειακές τρύπες!' },
+    { id: 66, theme: 'device_security', question_text: 'Ποιος κίνδυνος υπάρχει σε δημόσιο Wi-Fi;', options: { a: 'Δεν υπάρχει κίνδυνος', b: 'Μπορεί κάποιος να υποκλέψει το σήμα', c: 'Θα σπάσει το κινητό' }, correct_answer: 'b', explanation: 'Το δημόσιο Wi-Fi είναι ανασφαλές!' },
+    
+    // Θεματική 6: Ψηφιακός Γραμματισμός (6)
+    { id: 67, theme: 'media_literacy', question_text: 'Όταν διαβάζετε μια είδηση online, πώς ελέγχετε αν είναι αληθινή;', options: { a: 'Την κοινοποιώ αν συμφωνώ', b: 'Ελέγχω την πηγή / κάνω αναζήτηση', c: 'Δεν με απασχολεί' }, correct_answer: 'b', explanation: 'Πάντα έλεγχε την πηγή!' },
+    { id: 68, theme: 'media_literacy', question_text: 'Τι είναι η παραπληροφόρηση (fake news);', options: { a: 'Μια άποψη που δε μου αρέσει', b: 'Εσκεμμένα ψευδές ή παραπλανητικό περιεχόμενο', c: 'Χιουμοριστική δημοσίευση' }, correct_answer: 'b', explanation: 'Το fake news είναι εσκεμμένα ψευδές!' },
+    { id: 69, theme: 'media_literacy', question_text: 'Ποια πηγή θεωρείτε πιο αξιόπιστη;', options: { a: 'Επαληθευμένο μέσο ενημέρωσης', b: 'Blog ή άτομο με πολλούς followers', c: 'Οποιοδήποτε αποτέλεσμα στην Google' }, correct_answer: 'a', explanation: 'Τα επαληθευμένα μέσα είναι πιο αξιόπιστα!' },
+    { id: 70, theme: 'media_literacy', question_text: 'Έχετε ελέγξει ποτέ αν μια φωτογραφία online είναι αληθινή;', options: { a: 'Ναι, με αντίστροφη αναζήτηση εικόνας', b: 'Όχι, δεν ξέρω πώς γίνεται', c: 'Δεν με ενδιαφέρει' }, correct_answer: 'a', explanation: 'Χρησιμοποίησ αντίστροφη αναζήτηση εικόνας!' },
+    { id: 71, theme: 'media_literacy', question_text: 'Ξέρετε τι είναι το echo chamber (θάλαμος αντήχησης);', options: { a: 'Όχι', b: 'Ναι – όταν βλέπουμε μόνο απόψεις που συμφωνούμε', c: 'Κάτι σχετικό με τη μουσική' }, correct_answer: 'b', explanation: 'Το echo chamber περιορίζει τις απόψεις μας!' },
+    { id: 72, theme: 'media_literacy', question_text: 'Πιστεύετε ότι οι αλγόριθμοι επηρεάζουν τι βλέπετε online;', options: { a: 'Όχι', b: 'Ναι', c: 'Δεν γνωρίζω' }, correct_answer: 'b', explanation: 'Οι αλγόριθμοι φιλτράρουν τι βλέπεις!' },
+    { id: 73, theme: 'media_literacy', question_text: 'Έχετε πέσει ποτέ θύμα παραπληροφόρησης;', options: { a: 'Ναι', b: 'Όχι', c: 'Ίσως' }, correct_answer: 'a', explanation: 'Πολλοί έχουν πέσει θύματα παραπληροφόρησης!' },
+    { id: 74, theme: 'media_literacy', question_text: 'Πόσο άνετα νιώθετε να διασταυρώνετε πληροφορίες;', options: { a: 'Πολύ άνετα', b: 'Λίγο', c: 'Καθόλου' }, correct_answer: 'a', explanation: 'Πρέπει να είσαι άνετος να διασταυρώνεις πληροφορίες!' },
+    { id: 75, theme: 'media_literacy', question_text: 'Από πού ενημερώνεστε κυρίως;', options: { a: 'Κοινωνικά δίκτυα', b: 'Επαγγελματικά ή επιστημονικά μέσα', c: 'Παραδοσιακά ΜΜΕ' }, correct_answer: 'b', explanation: 'Τα επαγγελματικά μέσα είναι πιο αξιόπιστα!' },
+  ];
+
+  // ============================================
+  // ΕΠΑΓΓΕΛΜΑΤΙΕΣ (IT & ADVANCED) - 35 ΕΡΩΤΗΣΕΙΣ
+  // ============================================
+  const professionalQuestions = [
+    // Θεματική 1: Advanced Authentication (5)
+    { id: 76, theme: 'advanced_auth', question_text: 'Τι είναι MFA;', options: { a: 'Multi Factor Authentication', b: 'Mail Forwarding Application', c: 'Media File Access' }, correct_answer: 'a', explanation: 'Το MFA χρησιμοποιεί πολλαπλούς παράγοντες ταυτοποίησης!' },
+    { id: 77, theme: 'advanced_auth', question_text: 'Τι είναι Single Sign-On (SSO);', options: { a: 'Ένας κωδικός για όλα με ασφάλεια', b: 'Password manager', c: 'VPN' }, correct_answer: 'a', explanation: 'Το SSO απλοποιεί τη διαχείριση κωδικών!' },
+    { id: 78, theme: 'advanced_auth', question_text: 'Ποιο password policy είναι πιο ασφαλές;', options: { a: 'Min 8 χαρακτήρες', b: 'Min 12 χαρακτήρες με complexity', c: 'Όποιο θυμάται ο χρήστης' }, correct_answer: 'b', explanation: 'Min 12 χαρακτήρες με complexity είναι πιο ασφαλές!' },
+    { id: 79, theme: 'advanced_auth', question_text: 'Τι είναι password manager;', options: { a: 'Αποθήκευση και δημιουργία ισχυρών κωδικών', b: 'Αποθήκευση φωτογραφιών', c: 'VPN πρόγραμμα' }, correct_answer: 'a', explanation: 'Ο password manager διαχειρίζεται κωδικούς ασφαλώς!' },
+    { id: 80, theme: 'advanced_auth', question_text: 'Ποια μέθοδος αυθεντικοποίησης είναι πιο ασφαλής;', options: { a: 'Password μόνο', b: 'Password + token ή app', c: 'Password + email' }, correct_answer: 'b', explanation: 'Το Password + token είναι πιο ασφαλές!' },
+    
+    // Θεματική 2: Social Engineering (5)
+    { id: 81, theme: 'phishing', question_text: 'Τι είναι spear phishing;', options: { a: 'Γενικά phishing emails', b: 'Στοχευμένο phishing σε συγκεκριμένο άτομο', c: 'Scam SMS' }, correct_answer: 'b', explanation: 'Το spear phishing είναι στοχευμένο και επικίνδυνο!' },
+    { id: 82, theme: 'phishing', question_text: 'Τι είναι social engineering;', options: { a: 'Επίθεση σε social media', b: 'Εξαπάτηση ανθρώπων για πρόσβαση σε πληροφορίες', c: 'Χρήση bots online' }, correct_answer: 'b', explanation: 'Το social engineering εκμεταλλεύεται την ανθρώπινη φύση!' },
+    { id: 83, theme: 'phishing', question_text: 'Ποιο είναι παράδειγμα social engineering;', options: { a: 'Email με ιό', b: 'Τηλεφώνημα από «τεχνική υποστήριξη» που ζητά credentials', c: 'Fake news' }, correct_answer: 'b', explanation: 'Αυτό είναι κλασσικό παράδειγμα social engineering!' },
+    { id: 84, theme: 'phishing', question_text: 'Τι πρέπει να κάνετε αν λάβετε ύποπτο email στο εταιρικό σας;', options: { a: 'Να το προωθήσετε σε συναδέλφους', b: 'Να το αναφέρετε στο IT/security team', c: 'Να το αγνοήσετε' }, correct_answer: 'b', explanation: 'Αναφέρ πάντα στο IT/security team!' },
+    { id: 85, theme: 'phishing', question_text: 'Ποια μέθοδος μειώνει τον κίνδυνο social engineering;', options: { a: 'Awareness training', b: 'Νέο antivirus', c: 'Πιο γρήγορο internet' }, correct_answer: 'a', explanation: 'Η εκπαίδευση είναι το καλύτερο εργαλείο!' },
+    
+    // Θεματική 3: Cloud & Network Security (5)
+    { id: 86, theme: 'network_security', question_text: 'Τι είναι VPN;', options: { a: 'Εικονικό ιδιωτικό δίκτυο', b: 'Antivirus', c: 'Password manager' }, correct_answer: 'a', explanation: 'Το VPN κρυπτογραφεί την σύνδεσή σου!' },
+    { id: 87, theme: 'network_security', question_text: 'Ποια είναι η κύρια απειλή σε cloud περιβάλλον;', options: { a: 'Malware', b: 'Κακή διαχείριση προσβάσεων', c: 'Αργό internet' }, correct_answer: 'b', explanation: 'Η κακή διαχείριση προσβάσεων είναι το μεγαλύτερο πρόβλημα!' },
+    { id: 88, theme: 'network_security', question_text: 'Τι είναι DDoS attack;', options: { a: 'Virus σε υπολογιστή', b: 'Επίθεση υπερφόρτωσης server', c: 'Spam email' }, correct_answer: 'b', explanation: 'Το DDoS παραλύει τους servers!' },
+    { id: 89, theme: 'network_security', question_text: 'Τι είναι firewall;', options: { a: 'Φυσικός τοίχος προστασίας', b: 'Σύστημα φιλτραρίσματος κυκλοφορίας δικτύου', c: 'Antivirus πρόγραμμα' }, correct_answer: 'b', explanation: 'Το firewall ελέγχει τη δικτυακή κυκλοφορία!' },
+    { id: 90, theme: 'network_security', question_text: 'Τι είναι Zero Trust;', options: { a: 'Μη εμπιστοσύνη σε κανέναν χρήστη εξ ορισμού', b: 'Απαγόρευση πρόσβασης στο δίκτυο', c: 'VPN τύπου' }, correct_answer: 'a', explanation: 'Το Zero Trust δεν εμπιστεύεται κανέναν χωρίς verification!' },
+    
+    // Θεματική 4: GDPR & Compliance (5)
+    { id: 91, theme: 'gdpr_compliance', question_text: 'Τι είναι GDPR;', options: { a: 'Γενικός Κανονισμός Προστασίας Δεδομένων (ΕΕ)', b: 'Τεχνολογία encryption', c: 'Firewall πρόγραμμα' }, correct_answer: 'a', explanation: 'Το GDPR είναι ευρωπαϊκός κανονισμός!' },
+    { id: 92, theme: 'gdpr_compliance', question_text: 'Ποιο από τα παρακάτω είναι προσωπικό δεδομένο;', options: { a: 'Η IP διεύθυνση', b: 'Το είδος του browser', c: 'Το μέγεθος οθόνης' }, correct_answer: 'a', explanation: 'Η IP διεύθυνση είναι προσωπικό δεδομένο!' },
+    { id: 93, theme: 'gdpr_compliance', question_text: 'Πότε απαιτείται DPIA;', options: { a: 'Όταν επεξεργάζεσαι ευαίσθητα προσωπικά δεδομένα', b: 'Όταν αγοράζεις νέο antivirus', c: 'Όταν αλλάζεις password' }, correct_answer: 'a', explanation: 'Το DPIA απαιτείται για ευαίσθητα δεδομένα!' },
+    { id: 94, theme: 'gdpr_compliance', question_text: 'Τι σημαίνει data breach;', options: { a: 'Προστασία δεδομένων', b: 'Παραβίαση και διαρροή δεδομένων', c: 'Backup αρχείων' }, correct_answer: 'b', explanation: 'Το data breach είναι παραβίαση ασφάλειας!' },
+    { id: 95, theme: 'gdpr_compliance', question_text: 'Ποια αρχή εποπτεύει το GDPR στην Ελλάδα;', options: { a: 'ΑΔΑΕ', b: 'Αρχή Προστασίας Δεδομένων Προσωπικού Χαρακτήρα', c: 'Υπουργείο Ψηφιακής Διακυβέρνησης' }, correct_answer: 'b', explanation: 'Η ΑΠΔΠΧ εποπτεύει το GDPR στην Ελλάδα!' },
+    
+    // Θεματική 5: Incident Response (5)
+    { id: 96, theme: 'incident_response', question_text: 'Ποιο είναι το πρώτο βήμα σε security incident;', options: { a: 'Απόκρυψη συμβάντος', b: 'Ενημέρωση αρμόδιων και isolation', c: 'Restart συστήματος' }, correct_answer: 'b', explanation: 'Άμεση ενημέρωση και απομόνωση!' },
+    { id: 97, theme: 'incident_response', question_text: 'Τι είναι vulnerability scan;', options: { a: 'Έλεγχος αδυναμιών συστημάτων', b: 'Καθαρισμός cache', c: 'Backup αρχείων' }, correct_answer: 'a', explanation: 'Το vulnerability scan εντοπίζει αδυναμίες!' },
+    { id: 98, theme: 'incident_response', question_text: 'Τι είναι penetration test;', options: { a: 'Εξωτερική επίθεση για αξιολόγηση αδυναμιών', b: 'Update εφαρμογών', c: 'Κατέβασμα antivirus' }, correct_answer: 'a', explanation: 'Το penetration testing δοκιμάζει την ασφάλεια!' },
+    { id: 99, theme: 'incident_response', question_text: 'Τι είναι SIEM;', options: { a: 'Πρόγραμμα γραφικών', b: 'Security Information and Event Management', c: 'Password manager' }, correct_answer: 'b', explanation: 'Το SIEM συλλέγει και αναλύει events!' },
+    { id: 100, theme: 'incident_response', question_text: 'Τι είναι endpoint protection;', options: { a: 'Antivirus μόνο', b: 'Ολοκληρωμένη προστασία συσκευών τελικού χρήστη', c: 'VPN' }, correct_answer: 'b', explanation: 'Το endpoint protection προστατεύει συσκευές!' },
+    
+    // Θεματική 6: Advanced Practices (10)
+    { id: 101, theme: 'advanced_practices', question_text: 'Τι είναι η αρχή του ελάχιστου δικαιώματος;', options: { a: 'Πρόσβαση μόνο σε ό,τι είναι απαραίτητο', b: 'Πλήρη πρόσβαση για όλους', c: 'Κανείς δεν έχει πρόσβαση' }, correct_answer: 'a', explanation: 'Το least privilege είναι βασικό αρχή!' },
+    { id: 102, theme: 'advanced_practices', question_text: 'Ποιο είναι σωστό για τη διαχείριση δικαιωμάτων;', options: { a: 'Ενημερώνονται τακτικά με βάση τον ρόλο', b: 'Δίνονται μία φορά', c: 'Όλοι έχουν κοινό λογαριασμό' }, correct_answer: 'a', explanation: 'Τα δικαιώματα πρέπει να ενημερώνονται τακτικά!' },
+    { id: 103, theme: 'advanced_practices', question_text: 'Τι είναι το BYOD;', options: { a: 'Τεχνική hacking', b: 'Πολιτική χρήσης προσωπικών συσκευών στην εργασία', c: 'Cloud backup' }, correct_answer: 'b', explanation: 'Το BYOD είναι συχνό στις σύγχρονες εταιρείες!' },
+    { id: 104, theme: 'advanced_practices', question_text: 'Ποιοι κίνδυνοι σχετίζονται με το BYOD;', options: { a: 'Ασφαλέστερες συνδέσεις', b: 'Κίνδυνος απώλειας δεδομένων και malware', c: 'Ταχύτερη επεξεργασία' }, correct_answer: 'b', explanation: 'Το BYOD αυξάνει κινδύνους!' },
+    { id: 105, theme: 'advanced_practices', question_text: 'Τι είναι η πολιτική cookies;', options: { a: 'Δεν έχει σημασία', b: 'Πρέπει να συμμορφώνεται με GDPR', c: 'Την ορίζει η Google' }, correct_answer: 'b', explanation: 'Η πολιτική cookies πρέπει να είναι GDPR-compliant!' },
+    { id: 106, theme: 'advanced_practices', question_text: 'Ποιο ΔΕΝ είναι καλό παράδειγμα ασφάλειας;', options: { a: 'Ανανέωση κωδικών κάθε 3 μήνες', b: 'Αποθήκευση κωδικών σε post-it', c: 'Χρήση MFA' }, correct_answer: 'b', explanation: 'Ποτέ μην γράφεις κωδικούς σε post-it!' },
+    { id: 107, theme: 'advanced_practices', question_text: 'Τι είναι honeypot;', options: { a: 'Προστατευτικό για emails', b: 'Παγίδα που προσελκύει επιτιθέμενους', c: 'Antivirus' }, correct_answer: 'b', explanation: 'Το honeypot είναι παγίδα για επιτιθέμενους!' },
+    { id: 108, theme: 'advanced_practices', question_text: 'Τι είναι shadow IT;', options: { a: 'Εγκεκριμένα εργαλεία', b: 'Μη εξουσιοδοτημένες τεχνολογίες που χρησιμοποιούν εργαζόμενοι', c: 'Dark web apps' }, correct_answer: 'b', explanation: 'Το shadow IT είναι μη εγκεκριμένα εργαλεία!' },
+    { id: 109, theme: 'advanced_practices', question_text: 'Ποια είναι η σωστή αντίδραση σε data leak;', options: { a: 'Αγνοώ', b: 'Καταγράφω και ενημερώνω την ομάδα', c: 'Αλλάζω προσωπικά passwords' }, correct_answer: 'b', explanation: 'Άμεση αναφορά και καταγραφή!' },
+    { id: 110, theme: 'advanced_practices', question_text: 'Τι είναι "Security by Design";', options: { a: 'Ασφάλεια στο τέλος', b: 'Ασφάλεια από την αρχή στον σχεδιασμό', c: 'Δεν είναι απαραίτητη' }, correct_answer: 'b', explanation: 'Το Security by Design είναι βασικό!' },
+  ];
+
   const mockQuestions = {
-    child: [
-      {
-        id: 1,
-        theme: 'passwords',
-        question_text: 'Ποιος είναι ένας καλός κωδικός;',
-        options: { a: '123456', b: 'toonomamou', c: '$uperK0d1k0$' },
-        correct_answer: 'c',
-        explanation: 'Ένας δυνατός κωδικός έχει γράμματα, αριθμούς και σύμβολα!'
-      }
-    ],
-    adult: [
-      {
-        id: 3,
-        theme: 'passwords_auth',
-        question_text: 'Τι είναι Two Factor Authentication (2FA);',
-        options: { a: 'Έλεγχος δύο email', b: 'Έλεγχος με κωδικό + άλλο στοιχείο', c: 'Δεν ξέρω' },
-        correct_answer: 'b',
-        explanation: 'Το 2FA προσθέτει ένα επιπλέον επίπεδο ασφάλειας πέρα από τον κωδικό.'
-      }
-    ],
-    professional: [
-      {
-        id: 4,
-        theme: 'advanced_auth',
-        question_text: 'Τι είναι MFA;',
-        options: { a: 'Multi Factor Authentication', b: 'Mail Forwarding Application', c: 'Media File Access' },
-        correct_answer: 'a',
-        explanation: 'MFA απαιτεί πολλαπλούς παράγοντες επαλήθευσης!'
-      }
-    ]
+    child: childQuestions,
+    adult: adultQuestions,
+    professional: professionalQuestions
   };
 
   const categories = [
@@ -57,29 +190,12 @@ const CyberQuizApp = () => {
 
   const startSession = (selectedCategory) => {
     setCategory(selectedCategory);
-    //setSessionId(`session-${Date.now()}`);
     setStage('demographics');
   };
 
   const saveDemographics = async () => {
-    try {
-      const response = await fetch(`https://ideal-achievement.railway.app/api/questions/${category}`);
-      const data = await response.json();
-      
-      console.log('Fetched questions:', data);
-      console.log('Number of questions:', data.length);
-      
-      if (data && data.length > 0) {
-        setQuestions(data);
-        setStage('quiz');
-      } else {
-        alert('Δεν βρέθηκαν ερωτήσεις!');
-      }
-    } catch (error) {
-      console.error('Error fetching questions:', error);
-      setQuestions(mockQuestions[category] || mockQuestions.child);
-      setStage('quiz');
-    }
+    setQuestions(mockQuestions[category] || mockQuestions.child);
+    setStage('quiz');
   };
 
   const submitAnswer = (answer) => {
@@ -111,120 +227,29 @@ const CyberQuizApp = () => {
     
     Object.entries(results.theme_scores).forEach(([theme, score]) => {
       if (score < 60) {
-        const rec = getRecommendationForTheme(theme, category, 'high');
-        if (rec) recommendations.push(rec);
+        recommendations.push({
+          theme: theme,
+          text: `Χρειάζεσαι περισσότερη εκπαίδευση στο θέμα: ${theme}`,
+          priority: 'high'
+        });
       } else if (score < 80) {
-        const rec = getRecommendationForTheme(theme, category, 'medium');
-        if (rec) recommendations.push(rec);
+        recommendations.push({
+          theme: theme,
+          text: `Καλή δουλειά! Ίσως χρειαστεί λίγη περισσότερη εξάσκηση στο: ${theme}`,
+          priority: 'medium'
+        });
       }
     });
     
     if (recommendations.length === 0) {
       recommendations.push({
         theme: 'general',
-        text: category === 'child' 
-          ? 'Τα πας υπέροχα! Συνέχισε να είσαι προσεκτικός/η online! 🌟'
-          : category === 'adult'
-          ? 'Εξαιρετική επίδοση! Συνεχίστε να εφαρμόζετε καλές πρακτικές ασφάλειας! 🎯'
-          : 'Άριστη γνώση cybersecurity! Μοιραστείτε τις γνώσεις σας με τους συναδέλφους! 💼',
+        text: 'Εξαιρετική επίδοση! Συνεχίστε να εφαρμόζετε τις γνώσεις σας!',
         priority: 'low'
       });
     }
     
     return recommendations;
-  };
-
-  const getRecommendationForTheme = (theme, category, priority) => {
-    const recommendations = {
-      child: {
-        passwords: {
-          high: 'Οι κωδικοί είναι σαν το κλειδί του σπιτιού σου! Χρησιμοποίησε δυνατούς κωδικούς με γράμματα, αριθμούς και σύμβολα! 🔐',
-          medium: 'Μην μοιράζεσαι τους κωδικούς σου με φίλους - ούτε καν με τον καλύτερό σου! 🤫'
-        },
-        phishing: {
-          high: 'Πρόσεχε τα ύποπτα μηνύματα! Αν κάτι φαίνεται περίεργο, ρώτα έναν ενήλικα! ⚠️',
-          medium: 'Δείξε πάντα τα μηνύματα από αγνώστους στους γονείς σου! 👨‍👩‍👧'
-        },
-        social_media: {
-          high: 'Μην δέχεσαι φίλους που δεν γνωρίζεις στα social media! Μόνο πραγματικούς φίλους! 📱',
-          medium: 'Μην ανεβάζεις φωτογραφίες χωρίς την άδεια των γονιών σου! 📸'
-        },
-        privacy: {
-          high: 'Το όνομα, η διεύθυνση και το σχολείο σου είναι μυστικά! Μην τα λες σε αγνώστους online! 🔒',
-          medium: 'Ρώτα πάντα τους γονείς πριν μοιραστείς πληροφορίες στο internet! 🙋'
-        },
-        online_behavior: {
-          high: 'Να είσαι ευγενικός/ή online όπως και στην πραγματική ζωή! Όχι bullying! 💙',
-          medium: 'Αν κάποιος σε ενοχλεί online, μίλα αμέσως σε έναν ενήλικα! 🆘'
-        },
-        safe_browsing: {
-          high: 'Επισκέπτου μόνο ιστοσελίδες που εγκρίνουν οι γονείς σου! 🌐',
-          medium: 'Αν ένα site σου ζητάει χρήματα ή πληροφορίες, κλείσε το και πες στους γονείς! 🚫'
-        },
-        influencers: {
-          high: 'Όχι όλα όσα βλέπεις σε βίντεο είναι αλήθεια! Ρώτα έναν ενήλικα αν δεν είσαι σίγουρος/η! 🎬',
-          medium: 'Οι influencers πληρώνονται για να διαφημίζουν προϊόντα - σκέψου πριν πιστέψεις! 🤔'
-        }
-      },
-      adult: {
-        passwords_auth: {
-          high: 'Χρησιμοποιήστε μοναδικούς, δυνατούς κωδικούς για κάθε λογαριασμό! Εγκαταστήστε ένα password manager! 🔐',
-          medium: 'Ενεργοποιήστε το Two-Factor Authentication (2FA) σε όλους τους σημαντικούς λογαριασμούς! 📱'
-        },
-        phishing: {
-          high: 'Προσοχή στα ύποπτα emails! Ελέγξτε πάντα τον αποστολέα και μην κάνετε κλικ σε links! ⚠️',
-          medium: 'Μην εμπιστεύεστε emails που ζητούν επείγουσα δράση ή προσωπικά στοιχεία! 🎣'
-        },
-        social_media: {
-          high: 'Ελέγξτε τις ρυθμίσεις απορρήτου στα social media! Περιορίστε ποιος βλέπει τις αναρτήσεις σας! 🔒',
-          medium: 'Προσέξτε τι μοιράζεστε δημόσια - μπορεί να χρησιμοποιηθεί για social engineering! 📱'
-        },
-        privacy: {
-          high: 'Διαβάστε τις πολιτικές απορρήτου των υπηρεσιών που χρησιμοποιείτε! Περιορίστε τα δεδομένα που μοιράζεστε! 🛡️',
-          medium: 'Χρησιμοποιήστε VPN σε δημόσια Wi-Fi και απενεργοποιήστε το location tracking! 🌐'
-        },
-        online_shopping: {
-          high: 'Αγοράζετε μόνο από έμπιστες ιστοσελίδες με HTTPS! Ελέγξτε reviews και πιστοποιήσεις! 🛒',
-          medium: 'Μην αποθηκεύετε πιστωτικές κάρτες σε sites - χρησιμοποιήστε εικονικές κάρτες! 💳'
-        },
-        device_security: {
-          high: 'Ενημερώνετε τακτικά λειτουργικό σύστημα και εφαρμογές! Χρησιμοποιήστε antivirus! 💻',
-          medium: 'Κλειδώνετε τη συσκευή σας όταν δεν τη χρησιμοποιείτε! Χρησιμοποιήστε δυνατό PIN! 🔐'
-        }
-      },
-      professional: {
-        advanced_auth: {
-          high: 'Εφαρμόστε MFA σε όλα τα εταιρικά συστήματα! Χρησιμοποιήστε hardware tokens για κρίσιμες υπηρεσίες! 🔑',
-          medium: 'Εφαρμόστε Zero Trust architecture και least privilege access! 🛡️'
-        },
-        social_engineering: {
-          high: 'Εκπαιδεύστε το προσωπικό σε tactic social engineering! Κάντε simulated phishing tests! 🎓',
-          medium: 'Εφαρμόστε verification procedures για ευαίσθητες αιτήσεις (π.χ. wire transfers)! ☎️'
-        },
-        network_security: {
-          high: 'Εφαρμόστε network segmentation, IDS/IPS και regular security audits! 🔍',
-          medium: 'Χρησιμοποιήστε firewalls και encryption για όλη την εταιρική επικοινωνία! 🔒'
-        },
-        incident_response: {
-          high: 'Αναπτύξτε και δοκιμάστε incident response plan! Ορίστε ξεκάθαρα roles και procedures! 📋',
-          medium: 'Εφαρμόστε logging και monitoring για γρήγορη ανίχνευση απειλών! 📊'
-        },
-        compliance: {
-          high: 'Εξασφαλίστε συμμόρφωση με GDPR, ISO 27001 και άλλα standards! Κάντε τακτικά audits! ⚖️',
-          medium: 'Τεκμηριώστε όλες τις security policies και procedures! 📄'
-        },
-        data_protection: {
-          high: 'Εφαρμόστε data encryption at rest και in transit! Κάντε τακτικά encrypted backups! 💾',
-          medium: 'Εφαρμόστε Data Loss Prevention (DLP) tools και access controls! 🔐'
-        }
-      }
-    };
-    
-    return {
-      theme: theme,
-      text: recommendations[category]?.[theme]?.[priority] || 'Συνεχίστε να βελτιώνετε τις γνώσεις σας σε αυτόν τον τομέα! 📚',
-      priority: priority
-    };
   };
 
   const completeQuiz = () => {
@@ -274,7 +299,7 @@ const CyberQuizApp = () => {
   if (stage === 'category') {
     return (
       <>
-                <div className="min-h-screen animated-bg p-8" style={{ position: 'relative', zIndex: 1 }}>
+        <div className="min-h-screen animated-bg p-8" style={{ position: 'relative', zIndex: 1 }}>
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-16 animate-fade-in">
               <div className="flex items-center justify-center mb-6">
@@ -313,16 +338,16 @@ const CyberQuizApp = () => {
   }
 
   if (stage === 'demographics') {
-  return (
-    <div className="min-h-screen animated-bg">
-      <DemographicsForm
-        category={category}
-        onSubmit={saveDemographics}
-        onBack={() => setStage('category')}
-      />
-    </div>
-  );
-}
+    return (
+      <div className="min-h-screen animated-bg">
+        <DemographicsForm
+          category={category}
+          onSubmit={saveDemographics}
+          onBack={() => setStage('category')}
+        />
+      </div>
+    );
+  }
 
   if (stage === 'quiz' && questions.length > 0) {
     const question = questions[currentQuestion];
@@ -330,7 +355,7 @@ const CyberQuizApp = () => {
 
     return (
       <>
-               <div className="min-h-screen animated-bg p-8" style={{ position: 'relative', zIndex: 1 }}>
+        <div className="min-h-screen animated-bg p-8" style={{ position: 'relative', zIndex: 1 }}>
           <div className="max-w-4xl mx-auto">
             <div className="mb-8">
               <div className="flex justify-between text-white mb-2">
@@ -430,7 +455,7 @@ const CyberQuizApp = () => {
 
     return (
       <>
-               <div className="min-h-screen animated-bg p-8" style={{ position: 'relative', zIndex: 1 }}>
+        <div className="min-h-screen animated-bg p-8" style={{ position: 'relative', zIndex: 1 }}>
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-12">
               <Award className="w-24 h-24 text-yellow-400 mx-auto mb-6 animate-bounce" />
@@ -501,9 +526,7 @@ const CyberQuizApp = () => {
                       <AlertTriangle className={`w-6 h-6 mr-3 flex-shrink-0 ${rec.priority === 'high' ? 'text-red-400' : rec.priority === 'medium' ? 'text-yellow-400' : 'text-green-400'}`} />
                       <div>
                         <h4 className="text-white font-bold mb-2">{rec.theme.toUpperCase()}</h4>
-                        <p className="text-gray-
-
-                        200">{rec.text}</p>
+                        <p className="text-gray-200">{rec.text}</p>
                       </div>
                     </div>
                   </div>
