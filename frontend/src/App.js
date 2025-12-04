@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
-import { Shield, AlertTriangle, Award, TrendingUp, CheckCircle, XCircle, Target, BookOpen } from 'lucide-react';
+import { Shield, AlertTriangle, Award, TrendingUp, CheckCircle, XCircle, Target, BookOpen, Download } from 'lucide-react';
 import DemographicsForm from './components/DemographicsForm';
 
 const CyberQuizApp = () => {
@@ -12,6 +12,8 @@ const CyberQuizApp = () => {
   const [results, setResults] = useState(null);
   const [showFeedback, setShowFeedback] = useState(false);
   const [lastAnswer, setLastAnswer] = useState(null);
+  const [demographics, setDemographics] = useState(null);
+  const [sendingData, setSendingData] = useState(false);
 
   // ============================================
   // ΠΑΙΔΙΑ (8-12 ΕΤΩΝ) - 45 ΕΡΩΤΗΣΕΙΣ
@@ -120,7 +122,7 @@ const CyberQuizApp = () => {
     { id: 71, theme: 'media_literacy', question_text: 'Ξέρετε τι είναι το echo chamber (θάλαμος αντήχησης);', options: { a: 'Όχι', b: 'Ναι – όταν βλέπουμε μόνο απόψεις που συμφωνούμε', c: 'Κάτι σχετικό με τη μουσική' }, correct_answer: 'b', explanation: 'Το echo chamber περιορίζει τις απόψεις μας!' },
     { id: 72, theme: 'media_literacy', question_text: 'Πιστεύετε ότι οι αλγόριθμοι επηρεάζουν τι βλέπετε online;', options: { a: 'Όχι', b: 'Ναι', c: 'Δεν γνωρίζω' }, correct_answer: 'b', explanation: 'Οι αλγόριθμοι φιλτράρουν τι βλέπεις!' },
     { id: 73, theme: 'media_literacy', question_text: 'Έχετε πέσει ποτέ θύμα παραπληροφόρησης;', options: { a: 'Ναι', b: 'Όχι', c: 'Ίσως' }, correct_answer: 'a', explanation: 'Πολλοί έχουν πέσει θύματα παραπληροφόρησης!' },
-    { id: 74, theme: 'media_literacy', question_text: 'Πόσο άνετα νιώθετε να διασταυρώνετε πληροφορίες;', options: { a: 'Πολύ άνετα', b: 'Λίγο', c: 'Καθόλου' }, correct_answer: 'a', explanation: 'Πρέπει να είσαι άνετος να διασταυρώνεις πληροφορίες!' },
+    { id: 74, theme: 'media_literacy', question_text: 'Πόσο άνετα νιώθετε να διασταυρώνετε πληροφορίες;', options: { a: 'Πολύ άνετα', b: 'Λίγο', c: 'Καθόλου' }, correct_answer: 'a', explanation: 'Πρέπει να είσαι άνετος να διασταυρώνεις!' },
     { id: 75, theme: 'media_literacy', question_text: 'Από πού ενημερώνεστε κυρίως;', options: { a: 'Κοινωνικά δίκτυα', b: 'Επαγγελματικά ή επιστημονικά μέσα', c: 'Παραδοσιακά ΜΜΕ' }, correct_answer: 'b', explanation: 'Τα επαγγελματικά μέσα είναι πιο αξιόπιστα!' },
   ];
 
@@ -136,44 +138,44 @@ const CyberQuizApp = () => {
     { id: 80, theme: 'advanced_auth', question_text: 'Ποια μέθοδος αυθεντικοποίησης είναι πιο ασφαλής;', options: { a: 'Password μόνο', b: 'Password + token ή app', c: 'Password + email' }, correct_answer: 'b', explanation: 'Το Password + token είναι πιο ασφαλές!' },
     
     // Θεματική 2: Social Engineering (5)
-    { id: 81, theme: 'phishing', question_text: 'Τι είναι spear phishing;', options: { a: 'Γενικά phishing emails', b: 'Στοχευμένο phishing σε συγκεκριμένο άτομο', c: 'Scam SMS' }, correct_answer: 'b', explanation: 'Το spear phishing είναι στοχευμένο και επικίνδυνο!' },
+    { id: 81, theme: 'phishing', question_text: 'Τι είναι spear phishing;', options: { a: 'Γενικά phishing emails', b: 'Στοχευμένο phishing σε συγκεκριμένο άτομο', c: 'Scam SMS' }, correct_answer: 'b', explanation: 'Το spear phishing είναι στοχευμένο!' },
     { id: 82, theme: 'phishing', question_text: 'Τι είναι social engineering;', options: { a: 'Επίθεση σε social media', b: 'Εξαπάτηση ανθρώπων για πρόσβαση σε πληροφορίες', c: 'Χρήση bots online' }, correct_answer: 'b', explanation: 'Το social engineering εκμεταλλεύεται την ανθρώπινη φύση!' },
-    { id: 83, theme: 'phishing', question_text: 'Ποιο είναι παράδειγμα social engineering;', options: { a: 'Email με ιό', b: 'Τηλεφώνημα από «τεχνική υποστήριξη» που ζητά credentials', c: 'Fake news' }, correct_answer: 'b', explanation: 'Αυτό είναι κλασσικό παράδειγμα social engineering!' },
-    { id: 84, theme: 'phishing', question_text: 'Τι πρέπει να κάνετε αν λάβετε ύποπτο email στο εταιρικό σας;', options: { a: 'Να το προωθήσετε σε συναδέλφους', b: 'Να το αναφέρετε στο IT/security team', c: 'Να το αγνοήσετε' }, correct_answer: 'b', explanation: 'Αναφέρ πάντα στο IT/security team!' },
+    { id: 83, theme: 'phishing', question_text: 'Ποιο είναι παράδειγμα social engineering;', options: { a: 'Email με ιό', b: 'Τηλεφώνημα από «τεχνική υποστήριξη» που ζητά credentials', c: 'Fake news' }, correct_answer: 'b', explanation: 'Αυτό είναι κλασσικό παράδειγμα!' },
+    { id: 84, theme: 'phishing', question_text: 'Τι πρέπει να κάνετε αν λάβετε ύποπτο email;', options: { a: 'Να το προωθήσετε σε συναδέλφους', b: 'Να το αναφέρετε στο IT/security team', c: 'Να το αγνοήσετε' }, correct_answer: 'b', explanation: 'Αναφέρ πάντα στο IT team!' },
     { id: 85, theme: 'phishing', question_text: 'Ποια μέθοδος μειώνει τον κίνδυνο social engineering;', options: { a: 'Awareness training', b: 'Νέο antivirus', c: 'Πιο γρήγορο internet' }, correct_answer: 'a', explanation: 'Η εκπαίδευση είναι το καλύτερο εργαλείο!' },
     
-    // Θεματική 3: Cloud & Network Security (5)
+    // Θεματική 3: Cloud & Network (5)
     { id: 86, theme: 'network_security', question_text: 'Τι είναι VPN;', options: { a: 'Εικονικό ιδιωτικό δίκτυο', b: 'Antivirus', c: 'Password manager' }, correct_answer: 'a', explanation: 'Το VPN κρυπτογραφεί την σύνδεσή σου!' },
-    { id: 87, theme: 'network_security', question_text: 'Ποια είναι η κύρια απειλή σε cloud περιβάλλον;', options: { a: 'Malware', b: 'Κακή διαχείριση προσβάσεων', c: 'Αργό internet' }, correct_answer: 'b', explanation: 'Η κακή διαχείριση προσβάσεων είναι το μεγαλύτερο πρόβλημα!' },
-    { id: 88, theme: 'network_security', question_text: 'Τι είναι DDoS attack;', options: { a: 'Virus σε υπολογιστή', b: 'Επίθεση υπερφόρτωσης server', c: 'Spam email' }, correct_answer: 'b', explanation: 'Το DDoS παραλύει τους servers!' },
-    { id: 89, theme: 'network_security', question_text: 'Τι είναι firewall;', options: { a: 'Φυσικός τοίχος προστασίας', b: 'Σύστημα φιλτραρίσματος κυκλοφορίας δικτύου', c: 'Antivirus πρόγραμμα' }, correct_answer: 'b', explanation: 'Το firewall ελέγχει τη δικτυακή κυκλοφορία!' },
-    { id: 90, theme: 'network_security', question_text: 'Τι είναι Zero Trust;', options: { a: 'Μη εμπιστοσύνη σε κανέναν χρήστη εξ ορισμού', b: 'Απαγόρευση πρόσβασης στο δίκτυο', c: 'VPN τύπου' }, correct_answer: 'a', explanation: 'Το Zero Trust δεν εμπιστεύεται κανέναν χωρίς verification!' },
+    { id: 87, theme: 'network_security', question_text: 'Ποια είναι η κύρια απειλή σε cloud;', options: { a: 'Malware', b: 'Κακή διαχείριση προσβάσεων', c: 'Αργό internet' }, correct_answer: 'b', explanation: 'Η κακή διαχείριση προσβάσεων είναι το πρόβλημα!' },
+    { id: 88, theme: 'network_security', question_text: 'Τι είναι DDoS attack;', options: { a: 'Virus', b: 'Επίθεση υπερφόρτωσης server', c: 'Spam email' }, correct_answer: 'b', explanation: 'Το DDoS παραλύει τους servers!' },
+    { id: 89, theme: 'network_security', question_text: 'Τι είναι firewall;', options: { a: 'Φυσικός τοίχος', b: 'Σύστημα φιλτραρίσματος κυκλοφορίας δικτύου', c: 'Antivirus πρόγραμμα' }, correct_answer: 'b', explanation: 'Το firewall ελέγχει τη κυκλοφορία!' },
+    { id: 90, theme: 'network_security', question_text: 'Τι είναι Zero Trust;', options: { a: 'Μη εμπιστοσύνη σε κανέναν χρήστη εξ ορισμού', b: 'Απαγόρευση πρόσβασης', c: 'VPN τύπου' }, correct_answer: 'a', explanation: 'Το Zero Trust δεν εμπιστεύεται κανέναν!' },
     
     // Θεματική 4: GDPR & Compliance (5)
     { id: 91, theme: 'gdpr_compliance', question_text: 'Τι είναι GDPR;', options: { a: 'Γενικός Κανονισμός Προστασίας Δεδομένων (ΕΕ)', b: 'Τεχνολογία encryption', c: 'Firewall πρόγραμμα' }, correct_answer: 'a', explanation: 'Το GDPR είναι ευρωπαϊκός κανονισμός!' },
-    { id: 92, theme: 'gdpr_compliance', question_text: 'Ποιο από τα παρακάτω είναι προσωπικό δεδομένο;', options: { a: 'Η IP διεύθυνση', b: 'Το είδος του browser', c: 'Το μέγεθος οθόνης' }, correct_answer: 'a', explanation: 'Η IP διεύθυνση είναι προσωπικό δεδομένο!' },
-    { id: 93, theme: 'gdpr_compliance', question_text: 'Πότε απαιτείται DPIA;', options: { a: 'Όταν επεξεργάζεσαι ευαίσθητα προσωπικά δεδομένα', b: 'Όταν αγοράζεις νέο antivirus', c: 'Όταν αλλάζεις password' }, correct_answer: 'a', explanation: 'Το DPIA απαιτείται για ευαίσθητα δεδομένα!' },
-    { id: 94, theme: 'gdpr_compliance', question_text: 'Τι σημαίνει data breach;', options: { a: 'Προστασία δεδομένων', b: 'Παραβίαση και διαρροή δεδομένων', c: 'Backup αρχείων' }, correct_answer: 'b', explanation: 'Το data breach είναι παραβίαση ασφάλειας!' },
-    { id: 95, theme: 'gdpr_compliance', question_text: 'Ποια αρχή εποπτεύει το GDPR στην Ελλάδα;', options: { a: 'ΑΔΑΕ', b: 'Αρχή Προστασίας Δεδομένων Προσωπικού Χαρακτήρα', c: 'Υπουργείο Ψηφιακής Διακυβέρνησης' }, correct_answer: 'b', explanation: 'Η ΑΠΔΠΧ εποπτεύει το GDPR στην Ελλάδα!' },
+    { id: 92, theme: 'gdpr_compliance', question_text: 'Ποιο είναι προσωπικό δεδομένο;', options: { a: 'Η IP διεύθυνση', b: 'Το είδος του browser', c: 'Το μέγεθος οθόνης' }, correct_answer: 'a', explanation: 'Η IP διεύθυνση είναι προσωπικό δεδομένο!' },
+    { id: 93, theme: 'gdpr_compliance', question_text: 'Πότε απαιτείται DPIA;', options: { a: 'Όταν επεξεργάζεσαι ευαίσθητα δεδομένα', b: 'Όταν αγοράζεις antivirus', c: 'Όταν αλλάζεις password' }, correct_answer: 'a', explanation: 'Το DPIA απαιτείται για ευαίσθητα δεδομένα!' },
+    { id: 94, theme: 'gdpr_compliance', question_text: 'Τι σημαίνει data breach;', options: { a: 'Προστασία δεδομένων', b: 'Παραβίαση και διαρροή δεδομένων', c: 'Backup αρχείων' }, correct_answer: 'b', explanation: 'Το data breach είναι παραβίαση!' },
+    { id: 95, theme: 'gdpr_compliance', question_text: 'Ποια αρχή εποπτεύει το GDPR στην Ελλάδα;', options: { a: 'ΑΔΑΕ', b: 'Αρχή Προστασίας Δεδομένων Προσωπικού Χαρακτήρα', c: 'Υπουργείο Ψηφιακής' }, correct_answer: 'b', explanation: 'Η ΑΠΔΠΧ εποπτεύει το GDPR!' },
     
     // Θεματική 5: Incident Response (5)
-    { id: 96, theme: 'incident_response', question_text: 'Ποιο είναι το πρώτο βήμα σε security incident;', options: { a: 'Απόκρυψη συμβάντος', b: 'Ενημέρωση αρμόδιων και isolation', c: 'Restart συστήματος' }, correct_answer: 'b', explanation: 'Άμεση ενημέρωση και απομόνωση!' },
-    { id: 97, theme: 'incident_response', question_text: 'Τι είναι vulnerability scan;', options: { a: 'Έλεγχος αδυναμιών συστημάτων', b: 'Καθαρισμός cache', c: 'Backup αρχείων' }, correct_answer: 'a', explanation: 'Το vulnerability scan εντοπίζει αδυναμίες!' },
-    { id: 98, theme: 'incident_response', question_text: 'Τι είναι penetration test;', options: { a: 'Εξωτερική επίθεση για αξιολόγηση αδυναμιών', b: 'Update εφαρμογών', c: 'Κατέβασμα antivirus' }, correct_answer: 'a', explanation: 'Το penetration testing δοκιμάζει την ασφάλεια!' },
-    { id: 99, theme: 'incident_response', question_text: 'Τι είναι SIEM;', options: { a: 'Πρόγραμμα γραφικών', b: 'Security Information and Event Management', c: 'Password manager' }, correct_answer: 'b', explanation: 'Το SIEM συλλέγει και αναλύει events!' },
-    { id: 100, theme: 'incident_response', question_text: 'Τι είναι endpoint protection;', options: { a: 'Antivirus μόνο', b: 'Ολοκληρωμένη προστασία συσκευών τελικού χρήστη', c: 'VPN' }, correct_answer: 'b', explanation: 'Το endpoint protection προστατεύει συσκευές!' },
+    { id: 96, theme: 'incident_response', question_text: 'Ποιο είναι το πρώτο βήμα σε incident;', options: { a: 'Απόκρυψη', b: 'Ενημέρωση αρμόδιων και isolation', c: 'Restart' }, correct_answer: 'b', explanation: 'Άμεση ενημέρωση!' },
+    { id: 97, theme: 'incident_response', question_text: 'Τι είναι vulnerability scan;', options: { a: 'Έλεγχος αδυναμιών', b: 'Καθαρισμός cache', c: 'Backup' }, correct_answer: 'a', explanation: 'Vulnerability scan εντοπίζει αδυναμίες!' },
+    { id: 98, theme: 'incident_response', question_text: 'Τι είναι penetration test;', options: { a: 'Εξωτερική επίθεση για αξιολόγηση', b: 'Update εφαρμογών', c: 'Κατέβασμα antivirus' }, correct_answer: 'a', explanation: 'Penetration testing δοκιμάζει την ασφάλεια!' },
+    { id: 99, theme: 'incident_response', question_text: 'Τι είναι SIEM;', options: { a: 'Πρόγραμμα γραφικών', b: 'Security Information and Event Management', c: 'Password manager' }, correct_answer: 'b', explanation: 'Το SIEM συλλέγει events!' },
+    { id: 100, theme: 'incident_response', question_text: 'Τι είναι endpoint protection;', options: { a: 'Antivirus μόνο', b: 'Ολοκληρωμένη προστασία συσκευών', c: 'VPN' }, correct_answer: 'b', explanation: 'Endpoint protection προστατεύει συσκευές!' },
     
     // Θεματική 6: Advanced Practices (10)
-    { id: 101, theme: 'advanced_practices', question_text: 'Τι είναι η αρχή του ελάχιστου δικαιώματος;', options: { a: 'Πρόσβαση μόνο σε ό,τι είναι απαραίτητο', b: 'Πλήρη πρόσβαση για όλους', c: 'Κανείς δεν έχει πρόσβαση' }, correct_answer: 'a', explanation: 'Το least privilege είναι βασικό αρχή!' },
-    { id: 102, theme: 'advanced_practices', question_text: 'Ποιο είναι σωστό για τη διαχείριση δικαιωμάτων;', options: { a: 'Ενημερώνονται τακτικά με βάση τον ρόλο', b: 'Δίνονται μία φορά', c: 'Όλοι έχουν κοινό λογαριασμό' }, correct_answer: 'a', explanation: 'Τα δικαιώματα πρέπει να ενημερώνονται τακτικά!' },
-    { id: 103, theme: 'advanced_practices', question_text: 'Τι είναι το BYOD;', options: { a: 'Τεχνική hacking', b: 'Πολιτική χρήσης προσωπικών συσκευών στην εργασία', c: 'Cloud backup' }, correct_answer: 'b', explanation: 'Το BYOD είναι συχνό στις σύγχρονες εταιρείες!' },
-    { id: 104, theme: 'advanced_practices', question_text: 'Ποιοι κίνδυνοι σχετίζονται με το BYOD;', options: { a: 'Ασφαλέστερες συνδέσεις', b: 'Κίνδυνος απώλειας δεδομένων και malware', c: 'Ταχύτερη επεξεργασία' }, correct_answer: 'b', explanation: 'Το BYOD αυξάνει κινδύνους!' },
-    { id: 105, theme: 'advanced_practices', question_text: 'Τι είναι η πολιτική cookies;', options: { a: 'Δεν έχει σημασία', b: 'Πρέπει να συμμορφώνεται με GDPR', c: 'Την ορίζει η Google' }, correct_answer: 'b', explanation: 'Η πολιτική cookies πρέπει να είναι GDPR-compliant!' },
-    { id: 106, theme: 'advanced_practices', question_text: 'Ποιο ΔΕΝ είναι καλό παράδειγμα ασφάλειας;', options: { a: 'Ανανέωση κωδικών κάθε 3 μήνες', b: 'Αποθήκευση κωδικών σε post-it', c: 'Χρήση MFA' }, correct_answer: 'b', explanation: 'Ποτέ μην γράφεις κωδικούς σε post-it!' },
-    { id: 107, theme: 'advanced_practices', question_text: 'Τι είναι honeypot;', options: { a: 'Προστατευτικό για emails', b: 'Παγίδα που προσελκύει επιτιθέμενους', c: 'Antivirus' }, correct_answer: 'b', explanation: 'Το honeypot είναι παγίδα για επιτιθέμενους!' },
-    { id: 108, theme: 'advanced_practices', question_text: 'Τι είναι shadow IT;', options: { a: 'Εγκεκριμένα εργαλεία', b: 'Μη εξουσιοδοτημένες τεχνολογίες που χρησιμοποιούν εργαζόμενοι', c: 'Dark web apps' }, correct_answer: 'b', explanation: 'Το shadow IT είναι μη εγκεκριμένα εργαλεία!' },
-    { id: 109, theme: 'advanced_practices', question_text: 'Ποια είναι η σωστή αντίδραση σε data leak;', options: { a: 'Αγνοώ', b: 'Καταγράφω και ενημερώνω την ομάδα', c: 'Αλλάζω προσωπικά passwords' }, correct_answer: 'b', explanation: 'Άμεση αναφορά και καταγραφή!' },
-    { id: 110, theme: 'advanced_practices', question_text: 'Τι είναι "Security by Design";', options: { a: 'Ασφάλεια στο τέλος', b: 'Ασφάλεια από την αρχή στον σχεδιασμό', c: 'Δεν είναι απαραίτητη' }, correct_answer: 'b', explanation: 'Το Security by Design είναι βασικό!' },
+    { id: 101, theme: 'advanced_practices', question_text: 'Τι είναι least privilege;', options: { a: 'Πρόσβαση μόνο σε ό,τι είναι απαραίτητο', b: 'Πλήρη πρόσβαση για όλους', c: 'Κανείς δεν έχει πρόσβαση' }, correct_answer: 'a', explanation: 'Least privilege είναι βασικό αρχή!' },
+    { id: 102, theme: 'advanced_practices', question_text: 'Ποιο είναι σωστό για δικαιώματα;', options: { a: 'Ενημερώνονται τακτικά', b: 'Δίνονται μία φορά', c: 'Όλοι έχουν κοινό λογαριασμό' }, correct_answer: 'a', explanation: 'Δικαιώματα ενημερώνονται τακτικά!' },
+    { id: 103, theme: 'advanced_practices', question_text: 'Τι είναι BYOD;', options: { a: 'Τεχνική hacking', b: 'Πολιτική χρήσης προσωπικών συσκευών', c: 'Cloud backup' }, correct_answer: 'b', explanation: 'Το BYOD είναι συχνό!' },
+    { id: 104, theme: 'advanced_practices', question_text: 'Ποιοι κίνδυνοι με BYOD;', options: { a: 'Ασφαλέστερες συνδέσεις', b: 'Κίνδυνος απώλειας δεδομένων', c: 'Ταχύτερη επεξεργασία' }, correct_answer: 'b', explanation: 'Το BYOD αυξάνει κινδύνους!' },
+    { id: 105, theme: 'advanced_practices', question_text: 'Πολιτική cookies;', options: { a: 'Δεν έχει σημασία', b: 'Πρέπει να συμμορφώνεται με GDPR', c: 'Την ορίζει η Google' }, correct_answer: 'b', explanation: 'GDPR-compliant απαραίτητο!' },
+    { id: 106, theme: 'advanced_practices', question_text: 'Ποιο ΔΕΝ είναι καλό;', options: { a: 'Ανανέωση κωδικών', b: 'Αποθήκευση κωδικών σε post-it', c: 'Χρήση MFA' }, correct_answer: 'b', explanation: 'Ποτέ post-it!' },
+    { id: 107, theme: 'advanced_practices', question_text: 'Τι είναι honeypot;', options: { a: 'Προστατευτικό emails', b: 'Παγίδα για επιτιθέμενους', c: 'Antivirus' }, correct_answer: 'b', explanation: 'Honeypot είναι παγίδα!' },
+    { id: 108, theme: 'advanced_practices', question_text: 'Τι είναι shadow IT;', options: { a: 'Εγκεκριμένα εργαλεία', b: 'Μη εξουσιοδοτημένες τεχνολογίες', c: 'Dark web' }, correct_answer: 'b', explanation: 'Shadow IT μη εγκεκριμένα!' },
+    { id: 109, theme: 'advanced_practices', question_text: 'Σωστή αντίδραση σε data leak;', options: { a: 'Αγνοώ', b: 'Καταγράφω και ενημερώνω', c: 'Αλλάζω passwords' }, correct_answer: 'b', explanation: 'Άμεση αναφορά!' },
+    { id: 110, theme: 'advanced_practices', question_text: 'Τι είναι Security by Design;', options: { a: 'Ασφάλεια στο τέλος', b: 'Ασφάλεια από την αρχή', c: 'Δεν είναι απαραίτητη' }, correct_answer: 'b', explanation: 'Security by Design βασικό!' },
   ];
 
   const mockQuestions = {
@@ -193,7 +195,8 @@ const CyberQuizApp = () => {
     setStage('demographics');
   };
 
-  const saveDemographics = async () => {
+  const saveDemographics = (data) => {
+    setDemographics(data);
     setQuestions(mockQuestions[category] || mockQuestions.child);
     setStage('quiz');
   };
@@ -252,6 +255,39 @@ const CyberQuizApp = () => {
     return recommendations;
   };
 
+  const sendResultsToFormspree = async (finalResults) => {
+    setSendingData(true);
+    try {
+      const submissionData = {
+        timestamp: new Date().toLocaleString('el-GR'),
+        category: category === 'child' ? 'Παιδιά' : category === 'adult' ? 'Ενήλικες' : 'Επαγγελματίες',
+        total_score: finalResults.total_score,
+        correct_answers: finalResults.correct_answers,
+        total_questions: finalResults.total_questions,
+        performance_level: finalResults.performance_level,
+        theme_scores: JSON.stringify(finalResults.theme_scores),
+        demographics: demographics ? JSON.stringify(demographics) : 'Δεν συμπληρώθηκαν'
+      };
+
+      const response = await fetch('https://formspree.io/f/xzznvzvv', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(submissionData)
+      });
+
+      if (response.ok) {
+        console.log('✅ Αποτελέσματα αποστολής: Επιτυχής!');
+      } else {
+        console.log('⚠️ Προειδοποίηση: Τα αποτελέσματα δεν στάλθηκαν');
+      }
+    } catch (error) {
+      console.error('❌ Σφάλμα:', error);
+    }
+    setSendingData(false);
+  };
+
   const completeQuiz = () => {
     const correctCount = userAnswers.filter(a => a.isCorrect).length;
     const totalQuestions = questions.length;
@@ -292,6 +328,9 @@ const CyberQuizApp = () => {
       }, category)
     };
 
+    // Στέλνουμε τα αποτελέσματα στο Formspree
+    sendResultsToFormspree(finalResults);
+    
     setResults(finalResults);
     setStage('results');
   };
@@ -471,6 +510,12 @@ const CyberQuizApp = () => {
               <p className="text-gray-400 mt-2">
                 {results.correct_answers} / {results.total_questions} σωστές απαντήσεις
               </p>
+              {sendingData && (
+                <p className="text-cyan-400 mt-4 animate-pulse">📧 Αποστολή αποτελεσμάτων...</p>
+              )}
+              {!sendingData && (
+                <p className="text-green-400 mt-4">✅ Τα αποτελέσματα αποστάλθηκαν με επιτυχία!</p>
+              )}
             </div>
 
             <div className="grid md:grid-cols-2 gap-8 mb-12">
