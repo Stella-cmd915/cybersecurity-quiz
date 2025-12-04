@@ -57,7 +57,7 @@ const CyberQuizApp = () => {
 
   const startSession = (selectedCategory) => {
     setCategory(selectedCategory);
-    setSessionId(`session-${Date.now()}`);
+    //setSessionId(`session-${Date.now()}`);
     setStage('demographics');
   };
 
