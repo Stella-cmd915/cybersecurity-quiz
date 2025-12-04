@@ -1,1 +1,2 @@
+release: python insert_all_questions.py
 web: gunicorn app:app
