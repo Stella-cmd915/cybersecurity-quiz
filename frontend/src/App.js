@@ -63,7 +63,7 @@ const CyberQuizApp = () => {
 
   const saveDemographics = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/questions/${category}`);
+      const response = await fetch(`https://ideal-achievement.railway.app/api/questions/${category}`);
       const data = await response.json();
       
       console.log('Fetched questions:', data);
